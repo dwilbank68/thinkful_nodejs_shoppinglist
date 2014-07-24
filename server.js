@@ -14,6 +14,18 @@ var server = http.createServer(function (req, res) {
         return parseInt(pathname.slice(1),10);
     };
 
+    var handleItemNum = function(index) {
+        if (isNaN(index)) {
+            res.statusCode = 400;
+            res.end('Item id is not valid');
+        } else if (!items[index]) {
+            res.statusCode = 404;
+            res.end('Item not found');
+        } else {
+            return true;
+        }
+    };
+
     switch (req.method) {
         case 'POST':
             item = '';
@@ -35,14 +47,7 @@ var server = http.createServer(function (req, res) {
             break;
         case 'DELETE':
             idx = getItemNumFromUrl();
-
-            if (isNaN(idx)) {
-                res.statusCode = 400;
-                res.end('Item id is not valid');
-            } else if (!items[idx]) {
-                res.statusCode = 404;
-                res.end('Item not found');
-            } else {
+            if (handleItemNum(idx)) {
                 items.splice(idx,1);
                 res.end('Item deleted successfully');
                 console.log("items is " + items);
@@ -50,14 +55,7 @@ var server = http.createServer(function (req, res) {
             break;
         case 'PUT':
             idx = getItemNumFromUrl();
-
-            if (isNaN(idx)) {
-                res.statusCode = 400;
-                res.end('Item id is not valid');
-            } else if (!items[idx]) {
-                res.statusCode = 404;
-                res.end('Item not found');
-            } else {
+            if (handleItemNum(idx)) {
                 item = '';
                 req.setEncoding('utf8');
                 req.on('data', function (chunk) {
